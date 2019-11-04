@@ -1,0 +1,396 @@
+
+
+2.Find a image from dockerhub of your choice(recommeded: nginx), don't use browser, pull the official image from dockerhub
+
+    Used Command :- "docker pull nginx" -----to pull the image from docker hub
+    $ docker pull nginx
+      Using default tag: latest
+      latest: Pulling from library/nginx
+      8d691f585fa8: Pull complete
+      5b07f4e08ad0: Pull complete
+      abc291867bca: Pull complete
+      Digest: sha256:922c815aa4df050d4df476e92daed4231f466acc8ee90e0e774951b0fd7195a4
+      Status: Downloaded newer image for nginx:latest
+
+3. List all the available images in your machine/vm, make sure you see recently pulled image in the list.
+    
+    Command:- "docker image ls" ---- it will list out all the available image in the machine
+
+    Available image list:-
+       
+    REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+    nginx               latest              540a289bab6c        8 days ago          126MB
+    redis               latest              4760dc956b2d        19 months ago       107MB
+    ubuntu              latest              f975c5035748        20 months ago       112MB
+    alpine              latest              3fd9065eaf02        21 months ago       4.14MB
+
+
+    recently pulled image in the machine :- nginx
+
+
+
+5. Create a container of your image (creating container for nginx)
+
+   use command :- docker run --name "NGinx" -d nginx (NGinx is the specified name of the container given by User)
+   After that use command :- docker ps (it will show running container with the containerId, other parameter)
+
+   In my case:-
+  
+   CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS         PORTS               NAMES
+   ce9cc2910cfc        nginx               "nginx -g 'daemon of…"   15 seconds ago      Up 10 seconds  80/tcp        NGinx
+
+6. List all the running containers
+     
+   docker ps /docker container ls
+
+   CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS    PORTS               NAMES
+   edfc3b96f717        nginx               "nginx -g 'daemon of…"   2 minutes ago       Up 2 minutes    80/tcp              NGinx
+   2c3641bb4e81        ubuntu:latest       "/bin/bash"              13 minutes ago      Up 8 seconds                        condescending_kapitsa
+
+
+7. List all the running and stopped containers
+
+   docker container ls -a
+ 
+   $ docker container ls -a
+     CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS                  PORTS                    NAMES
+      edfc3b96f717       nginx               "nginx -g 'daemon of…"   4 minutes ago       Up 4 minutes            80/tcp              NGinx
+     2c3641bb4e81        ubuntu:latest       "/bin/bash"              16 minutes ago      Up 2 minutes                                condescending_kapitsa
+     2de9d32638f8        ubuntu:latest       "/bin/bash"              17 minutes ago      Exited (0) 16 minutes ago                       infallible_sammet
+     3f158e751ae9        ubuntu:latest       "/bin/bash"              22 minutes ago      Exited (0) 22 minutes ago                       optimistic_minsky
+     0c38ddc1ff02        ubuntu              "/bin/bash"              22 minutes ago      Exited (0) 22 minutes ago                       wonderful_shannon
+
+
+  As seen from the above list of container:-
+   Container Id(which is up):- in status column it is showing "up"
+     CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS                  PORTS                    NAMES
+     edfc3b96f717       nginx               "nginx -g 'daemon of…"   4 minutes ago       Up 4 minutes            80/tcp              NGinx
+     2c3641bb4e81        ubuntu:latest       "/bin/bash"              16 minutes ago      Up 2 minutes                                condescending_kapitsa
+
+   Container Id(which is down):- in status column it is showing exited
+     CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS                  PORTS                    NAMES
+     2de9d32638f8        ubuntu:latest       "/bin/bash"              17 minutes ago      Exited (0) 16 minutes ago                       infallible_sammet
+     3f158e751ae9        ubuntu:latest       "/bin/bash"              22 minutes ago      Exited (0) 22 minutes ago                       optimistic_minsky
+     0c38ddc1ff02        ubuntu              "/bin/bash"              22 minutes ago      Exited (0) 22 minutes ago                       wonderful_shannon
+
+8. Find out the "Full" containerId of the container and write it below.
+
+   $ docker ps -q --no-trunc|grep edfc
+    edfc3b96f7176a1378d3dd47b46a8c1d47f789b7b071833091f146365d05c24d(full container Id)
+
+     This is full container id for nginx image
+
+9. Find out how many image layers are used to build this image.
+
+
+    $ docker inspect nginx
+[
+    {
+        "Id": "sha256:540a289bab6cb1bf880086a9b803cf0c4cefe38cbb5cdefa199b69614525199f",
+        "RepoTags": [
+            "nginx:latest"
+        ],
+        "RepoDigests": [
+            "nginx@sha256:922c815aa4df050d4df476e92daed4231f466acc8ee90e0e774951b0fd7195a4"
+        ],
+        "Parent": "",
+        "Comment": "",
+        "Created": "2019-10-23T00:26:03.830480202Z",
+        "Container": "77b8bfc5e16274066a5d4c14915ea5e7387c062f8540cd970c54e9b6e38b1011",
+        "ContainerConfig": {
+            "Hostname": "77b8bfc5e162",
+            "Domainname": "",
+            "User": "",
+            "AttachStdin": false,
+            "AttachStdout": false,
+            "AttachStderr": false,
+            "ExposedPorts": {
+                "80/tcp": {}
+            },
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                "NGINX_VERSION=1.17.5",
+                "NJS_VERSION=0.3.6",
+                "PKG_RELEASE=1~buster"
+            ],
+            "Cmd": [
+                "/bin/sh",
+                "-c",
+                "#(nop) ",
+                "CMD [\"nginx\" \"-g\" \"daemon off;\"]"
+            ],
+            "ArgsEscaped": true,
+            "Image": "sha256:2e2fa75c52fdfe182fb66455d6db04849c683ef01d14a526211ba37831c66791",
+            "Volumes": null,
+            "WorkingDir": "",
+            "Entrypoint": null,
+            "OnBuild": null,
+            "Labels": {
+                "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>"
+            },
+            "StopSignal": "SIGTERM"
+        },
+        "DockerVersion": "18.06.1-ce",
+        "Author": "",
+        "Config": {
+            "Hostname": "",
+            "Domainname": "",
+            "User": "",
+            "AttachStdin": false,
+            "AttachStdout": false,
+            "AttachStderr": false,
+            "ExposedPorts": {
+                "80/tcp": {}
+            },
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                "NGINX_VERSION=1.17.5",
+                "NJS_VERSION=0.3.6",
+                "PKG_RELEASE=1~buster"
+            ],
+            "Cmd": [
+                "nginx",
+                "-g",
+                "daemon off;"
+            ],
+            "ArgsEscaped": true,
+            "Image": "sha256:2e2fa75c52fdfe182fb66455d6db04849c683ef01d14a526211ba37831c66791",
+            "Volumes": null,
+            "WorkingDir": "",
+            "Entrypoint": null,
+            "OnBuild": null,
+            "Labels": {
+                "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>"
+            },
+            "StopSignal": "SIGTERM"
+        },
+        "Architecture": "amd64",
+        "Os": "linux",
+        "Size": 126195199,
+        "VirtualSize": 126195199,
+        "GraphDriver": {
+            "Data": {
+                "RootDir": "/var/lib/docker/overlay/9447cb740a4196dd913364784cef8e4b5f45e94ddd27b7e5d386126654803467/root"
+            },
+            "Name": "overlay"
+        },
+        "RootFS": {
+            "Type": "layers",
+            "Layers": [
+                "sha256:b67d19e65ef653823ed62a5835399c610a40e8205c16f839c5cc567954fcf594",
+                "sha256:6eaad811af0237b78ba8b44a282d1564259d90007d628a032c5df7e3e2bbb613",
+                "sha256:a89b8f05da3a2cbe459ef3fecfec8076fd0a7568db81f9164147b6f642e2dadf"
+            ]
+        },
+        "Metadata": {
+            "LastTagTime": "0001-01-01T00:00:00Z"
+        }
+    }
+]
+--------------------------------------
+   Three image layer for the nginx 
+          "Layers": [
+                "sha256:b67d19e65ef653823ed62a5835399c610a40e8205c16f839c5cc567954fcf594",
+                "sha256:6eaad811af0237b78ba8b44a282d1564259d90007d628a032c5df7e3e2bbb613",
+                "sha256:a89b8f05da3a2cbe459ef3fecfec8076fd0a7568db81f9164147b6f642e2dadf"
+            ]
+
+
+10. Get the Apache Tomcat 7 server image from the docker hub.
+
+    Command used:-docker pull tomcat:7
+                 where(7 denotes tag/version number)
+  
+      $ docker pull tomcat:7
+        7: Pulling from library/tomcat
+          9a0b0ce99936: Pull complete
+          db3b6004c61a: Pull complete
+          f8f075920295: Pull complete
+          6ef14aff1139: Pull complete
+          962785d3b7f9: Pull complete
+          631589572f9b: Pull complete
+          c55a0c6f4c7b: Pull complete
+          379605d88e88: Pull complete
+          831e6e9c3029: Pull complete
+          e1417b6fbaf5: Pull complete
+         Digest: sha256:9b9b01f50a953d3fe24e78404c66cae3372b446d5b162f42c1c64da7e2ec3f51
+         Status: Downloaded newer image for tomcat:7
+
+11. Run the Apache Tomcat 7, I mean create a container of Apache Tomcat.
+      $ docker run -it -d tomcat:7
+
+12. Find out what is the IP Address of the Apache Tomcat Container that it is running on
+
+    $ docker ps
+        CONTAINER ID        IMAGE               COMMAND             CREATED             STATUSPORTS               NAMES
+         02fa52be2372        tomcat:7            "catalina.sh run"   2 minutes ago       Up 2 minutes8080/tcp            mystifying_morse
+        614753e1b78b        ubuntu              "/usr/bin/top -b"   8 minutes ago       Up 8 minutes                    topdemo
+    $ docker inspect 02fa52be2372(container id of tomcat 7)
+              "Ports": {
+                "8080/tcp": null
+            },
+            "SandboxKey": "/var/run/docker/netns/51f9a8217247",
+            "SecondaryIPAddresses": null,
+            "SecondaryIPv6Addresses": null,
+            "EndpointID": "2d46e3c5128cd19c776e3855d913f09006ac09e1dbed533f180f851a01cdf6b1",
+            "Gateway": "172.18.0.1",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "IPAddress": "172.18.0.3",
+
+   ip address is 172.18.0.3
+
+13. Which Port it is using?
+          $ docker ps
+        CONTAINER ID        IMAGE               COMMAND             CREATED             STATUSPORTS               NAMES
+         02fa52be2372        tomcat:7            "catalina.sh run"   2 minutes ago       Up 2 minutes8080/tcp            mystifying_morse
+        614753e1b78b        ubuntu              "/usr/bin/top -b"   8 minutes ago       Up 8 minutes                    topdemo
+    $ docker inspect 02fa52be2372(container id of tomcat 7)
+              "Ports": {
+                "8080/tcp": null
+            },
+            "SandboxKey": "/var/run/docker/netns/51f9a8217247",
+            "SecondaryIPAddresses": null,
+            "SecondaryIPv6Addresses": null,
+            "EndpointID": "2d46e3c5128cd19c776e3855d913f09006ac09e1dbed533f180f851a01cdf6b1",
+            "Gateway": "172.18.0.1",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "IPAddress": "172.18.0.3",
+
+   port is 8080
+
+14. Try to access the Tomcat's home page from your machine/vm.
+     facing issue while accessing tomcat home page
+
+15. What is the disk size of Apache Tomcat image?
+     $ docker image ls
+         REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+          ubuntu              19.04               51b0783967fc        3 days ago          70MB
+          tomcat              7                   e3a393545a10        2 weeks ago         506MB
+         redis               latest              4760dc956b2d        19 months ago       107MB
+        ubuntu              latest              f975c5035748        20 months ago       112MB
+         alpine              latest              3fd9065eaf02        22 months ago       4.14MB
+     size of Apache tomcat image is 506MB
+
+16. Find out list of all environment variables that is configured for tomcat image, can you see JAVA_HOME and CATALINA_HOME? What did you notice about it?
+
+      $ docker inspect 02fa52be2372(container id of tomcat 7)
+
+           bin:/usr/bin:/sbin:/bin",
+                "LANG=C.UTF-8",
+                "JAVA_HOME=/usr/local/openjdk-8",
+                "JAVA_VERSION=8u232",
+                "JAVA_BASE_URL=https://github.com/AdoptOpenJDK/openjdk8-upstream-binaries/releases/download/jdk8u232-b09/OpenJDK8U-jdk_",
+                "JAVA_URL_VERSION=8u232b09",
+                "CATALINA_HOME=/usr/local/tomcat",
+                "TOMCAT_NATIVE_LIBDIR=/usr/local/tomcat/native-jni-lib",
+                "LD_LIBRARY_PATH=/usr/local/tomcat/native-jni-lib",
+
+        environment variables are declared
+17. Find out which port is exposed for tomcat?
+
+ $ docker inspect 02fa52be2372(container id of tomcat 7)
+              "Ports": {
+                "8080/tcp": null
+            },
+18. Run multiple conntainers of tomcat on different port and access it's home page.
+
+     $ docker ps
+        CONTAINER ID        IMAGE               COMMAND             CREATED              STATUS PORTS                              NAMES
+        7cb988f27576        tomcat:7            "catalina.sh run"   52 seconds ago       Up 50 seconds 8080/tcp, 0.0.0.0:8887->8082/tcp   jovial_keldysh
+        08e638332ecb        tomcat:7            "catalina.sh run"   About a minute ago   Up About a minute 8080/tcp, 0.0.0.0:9888->9080/tcp   admiring_bhabha
+        fafa03a7676e        tomcat:7            "catalina.sh run"   2 minutes ago        Up 2 minutes 8080/tcp, 0.0.0.0:8889->8081/tcp   dreamy_sinoussi
+        614753e1b78b        ubuntu              "/usr/bin/top -b"   37 minutes ago       Up 37 minutes                                    topdemo
+     three different container id of same image are running
+      there are problem in accessing tomcat home page
+
+19. Pull ubuntu os from dockerhub, try to pull 2 images of ubuntu, Except the latest one.
+
+   $ docker pull ubuntu:19.04
+      19.04: Pulling from library/ubuntu
+      b21821a62007: Pull complete
+      3052859eed30: Pull complete
+      fba68c591566: Pull complete
+      aab6656eb3a7: Pull complete
+      Digest: sha256:994afd4700257cf708b1a8ded7b94d70326a814bc95a6f486247a8790d7c5a70
+      Status: Downloaded newer image for ubuntu:19.04
+  $ docker pull ubuntu:19.10
+      19.10: Pulling from library/ubuntu
+      da6fc00e4d0b: Pull complete
+      c3c0be9d84b3: Pull complete
+      9c1dda927878: Pull complete
+      4b8880231fa0: Pull complete
+      Digest: sha256:a5193c15d7705bc2be91781355c4932321c06c18914facdd113d5bfcace7f92d
+      Status: Downloaded newer image for ubuntu:19.10
+
+20. Run the container of ubuntu in attached mode.
+
+ running  firstly in attached mode
+
+    $ docker run -d --name demo4 ubuntu:19.04 /usr/bin/top -b
+62ff73f47c186f8f73f73e9f37e5f3c60461e3566328ff50627273968acda85d
+$ docker psCONTAINER ID        IMAGE               COMMAND             CREATED             STATUSPORTS               NAMES62ff73f47c18        ubuntu:19.04        "/usr/bin/top -b"   7 seconds ago       Up 6 seconds                    demo4
+14d4f775fb28        ubuntu:19.10        "/usr/bin/top -b"   3 minutes ago       Up 3 minutes                    demo2
+04a53ff2042a        ubuntu              "/usr/bin/top -b"   4 minutes ago       Up 4 minutes                    demo1$ docker attach demo4
+
+$docker attach demo4
+
+top - 13:04:45 up 13 min,  0 users,  load average: 0.00, 0.07, 0.05Tasks:   1 total,   1 running,   0 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  0.3 us,  0.3 sy,  0.0 ni, 99.3 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+MiB Mem :    737.5 total,    259.2 free,     86.6 used,    391.7 buff/cache
+MiB Swap:      0.0 total,      0.0 free,      0.0 used.    521.1 avail Mem
+
+  PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+    1 root      20   0    5892   3040   2700 R   0.0   0.4   0:00.04 top
+
+top - 13:04:48 up 13 min,  0 users,  load average: 0.00, 0.07, 0.05
+Tasks:   1 total,   1 running,   0 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  0.0 us,  0.3 sy,  0.0 ni, 99.7 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+MiB Mem :    737.5 total,    259.2 free,     86.5 used,    391.7 buff/cache
+MiB Swap:      0.0 total,      0.0 free,      0.0 used.    521.1 avail Mem
+
+  PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+    1 root      20   0    5892   3040   2700 R   0.0   0.4   0:00.04 top
+
+top - 13:04:51 up 13 min,  0 users,  load average: 0.00, 0.07, 0.05
+Tasks:   1 total,   1 running,   0 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  0.0 us,  0.3 sy,  0.0 ni, 99.7 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+MiB Mem :    737.5 total,    259.2 free,     86.5 used,    391.7 buff/cache
+MiB Swap:      0.0 total,      0.0 free,      0.0 used.    521.1 avail Mem
+
+  PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+    1 root      20   0    5892   3040   2700 R   0.0   0.4   0:00.04 top
+
+top - 13:04:54 up 13 min,  0 users,  load average: 0.00, 0.07, 0.05
+Tasks:   1 total,   1 running,   0 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  0.0 us,  0.3 sy,  0.0 ni, 99.7 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+MiB Mem :    737.5 total,    259.2 free,     86.5 used,    391.8 buff/cache
+MiB Swap:      0.0 total,      0.0 free,      0.0 used.    521.2 avail Mem
+
+  PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+    1 root      20   0    5892   3040   2700 R   0.0   0.4   0:00.04 top
+
+top - 13:04:57 up 13 min,  0 users,  load average: 0.00, 0.06, 0.05
+Tasks:   1 total,   1 running,   0 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  0.0 us,  0.3 sy,  0.0 ni, 99.7 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+MiB Mem :    737.5 total,    259.2 free,     86.5 used,    391.8 buff/cache
+MiB Swap:      0.0 total,      0.0 free,      0.0 used.    521.2 avail Mem
+
+  PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+    1 root      20   0    5892   3040   2700 R   0.0   0.4   0:00.04 top
+21. Run the container of another ubuntu in detached mode.
+
+$ docker run -d --name demo2 ubuntu:19.10 /usr/bin/top -b
+     14d4f775fb283bf5f59b123eb421e26b61124c954ef19dc9adb0c388bcf445c5
+$ docker ps
+     CONTAINER ID        IMAGE               COMMAND             CREATED              STATUS PORTS               NAMES
+    14d4f775fb28        ubuntu:19.10        "/usr/bin/top -b"   7 seconds ago        Up 5 seconds                     demo2
+
+
