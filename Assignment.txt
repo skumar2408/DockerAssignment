@@ -27,7 +27,20 @@
 
     recently pulled image in the machine :- nginx
 
+4. Find out the "Full" ImageId of the image that you pulled and write it below.
 
+ Getting full image id of the nginx image
+    $ docker image ls
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+ubuntu              latest              775349758637        6 days ago          64.2MB
+nginx               latest              540a289bab6c        2 weeks ago         126MB
+tomcat              7                   e3a393545a10        2 weeks ago         506MB
+ubuntu              <none>              16508e5c265d        14 months ago       84.1MB
+redis               latest              4e8db158f18d        15 months ago       83.4MB
+weaveworks/scope    1.9.1               4b07159e407b        15 months ago       68MB
+alpine              latest              11cd0b38bc3c        16 months ago       4.41MB
+$ docker images -q --no-trunc|grep 540
+sha256:540a289bab6cb1bf880086a9b803cf0c4cefe38cbb5cdefa199b69614525199f
 
 5. Create a container of your image (creating container for nginx)
 
@@ -393,4 +406,474 @@ $ docker ps
      CONTAINER ID        IMAGE               COMMAND             CREATED              STATUS PORTS               NAMES
     14d4f775fb28        ubuntu:19.10        "/usr/bin/top -b"   7 seconds ago        Up 5 seconds                     demo2
 
+22. Check how many ubuntu containers are running and stopped
 
+     root@ip-172-31-19-103:/home/ubuntu# docker ps -a|grep ubuntu
+      ea02507737e9        ubuntu:latest       "/bin/bash"         3 minutes ago       Exited (0) 3 minutes ago                          laughing_aryabhata
+      a8a210ee5d51        ubuntu:19.10        "/bin/bash"         4 minutes ago       Up 4 minutes                                      ecstatic_swanson
+      0aabcd5f3ecc        ubuntu:19.04        "/bin/bash"         5 minutes ago       Up 5 minutes                                      hungry_robinson
+   
+      2 container ubuntu:19.04,ubuntu:19.10 are running
+      ubuntu:latest is not in running condition
+23.Is the tomcat container running? If no, start one.
+    No it was not in running state, now i started
+
+    root@ip-172-31-19-103:/home/ubuntu# docker run -d -p 8888:8080 tomcat:7
+             b111abbc6e9882f3ed3dde59f298ceb47da012cb1675b838240cfcfb2508412f
+    root@ip-172-31-19-103:/home/ubuntu# docker ps | grep tomcat:7
+             b111abbc6e98        tomcat:7            "catalina.sh run"   19 seconds ago      Up 18 seconds       0.0.0.0:8888->8080/tcp   vigilant_pike
+25. Check if ubuntu conatiner is running? If no, start one in attached mode to the terminal.
+
+      docker run -d --name demo6 ubuntu:latest /usr/bin/top -b
+      docker attach demo5(in attached mode)
+
+        top - 06:40:00 up 33 min,  0 users,  load average: 0.00, 0.00, 0.00
+Tasks:   1 total,   1 running,   0 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  1.3 us,  0.3 sy,  0.0 ni, 98.3 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+KiB Mem :  1007556 total,   116188 free,   369148 used,   522220 buff/cache
+KiB Swap:        0 total,        0 free,        0 used.   505724 avail Mem
+
+  PID USER      PR  NI    VIRT    RES    SHR S %CPU %MEM     TIME+ COMMAND
+    1 root      20   0   36484   3012   2660 R  0.0  0.3   0:00.29 top
+
+top - 06:40:03 up 33 min,  0 users,  load average: 0.00, 0.00, 0.00
+Tasks:   1 total,   1 running,   0 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  0.0 us,  0.3 sy,  0.0 ni, 99.7 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+KiB Mem :  1007556 total,   116188 free,   369148 used,   522220 buff/cache
+KiB Swap:        0 total,        0 free,        0 used.   505724 avail Mem
+
+  PID USER      PR  NI    VIRT    RES    SHR S %CPU %MEM     TIME+ COMMAND
+    1 root      20   0   36484   3012   2660 R  0.0  0.3   0:00.29 top
+
+top - 06:40:06 up 33 min,  0 users,  load average: 0.00, 0.00, 0.00
+Tasks:   1 total,   1 running,   0 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  0.3 us,  0.0 sy,  0.0 ni, 99.7 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+KiB Mem :  1007556 total,   116000 free,   369328 used,   522228 buff/cache
+KiB Swap:        0 total,        0 free,        0 used.   506212 avail Mem
+
+  PID USER      PR  NI    VIRT    RES    SHR S %CPU %MEM     TIME+ COMMAND
+    1 root      20   0   36484   3012   2660 R  0.3  0.3   0:00.30 top
+
+top - 06:40:09 up 33 min,  0 users,  load average: 0.00, 0.00, 0.00
+Tasks:   1 total,   1 running,   0 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  0.0 us,  0.0 sy,  0.0 ni,100.0 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+KiB Mem :  1007556 total,   116000 free,   369324 used,   522232 buff/cache
+KiB Swap:        0 total,        0 free,        0 used.   506212 avail Mem
+
+  PID USER      PR  NI    VIRT    RES    SHR S %CPU %MEM     TIME+ COMMAND
+    1 root      20   0   36484   3012   2660 R  0.0  0.3   0:00.30 top
+
+top - 06:40:12 up 33 min,  0 users,  load average: 0.00, 0.00, 0.00
+Tasks:   1 total,   1 running,   0 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  0.0 us,  0.0 sy,  0.0 ni,100.0 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+KiB Mem :  1007556 total,   116000 free,   369324 used,   522232 buff/cache
+KiB Swap:        0 total,        0 free,        0 used.   506220 avail Mem
+
+  PID USER      PR  NI    VIRT    RES    SHR S %CPU %MEM     TIME+ COMMAND
+    1 root      20   0   36484   3012   2660 R  0.0  0.3   0:00.30 top
+
+top - 06:40:15 up 33 min,  0 users,  load average: 0.00, 0.00, 0.00
+Tasks:   1 total,   1 running,   0 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  0.0 us,  0.0 sy,  0.0 ni,100.0 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+KiB Mem :  1007556 total,   116000 free,   369324 used,   522232 buff/cache
+KiB Swap:        0 total,        0 free,        0 used.   506220 avail Mem
+
+  PID USER      PR  NI    VIRT    RES    SHR S %CPU %MEM     TIME+ COMMAND
+    1 root      20   0   36484   3012   2660 R  0.0  0.3   0:00.30 top
+
+top - 06:40:18 up 33 min,  0 users,  load average: 0.00, 0.00, 0.00
+Tasks:   1 total,   1 running,   0 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  0.0 us,  0.0 sy,  0.0 ni,100.0 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+KiB Mem :  1007556 total,   116000 free,   369324 used,   522232 buff/cache
+KiB Swap:        0 total,        0 free,        0 used.   506220 avail Mem
+
+  PID USER      PR  NI    VIRT    RES    SHR S %CPU %MEM     TIME+ COMMAND
+    1 root      20   0   36484   3012   2660 R  0.0  0.3   0:00.30 top
+
+top - 06:40:21 up 33 min,  0 users,  load average: 0.00, 0.00, 0.00
+Tasks:   1 total,   1 running,   0 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  0.0 us,  0.0 sy,  0.0 ni,100.0 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+KiB Mem :  1007556 total,   116000 free,   369320 used,   522236 buff/cache
+KiB Swap:        0 total,        0 free,        0 used.   506220 avail Mem
+
+  PID USER      PR  NI    VIRT    RES    SHR S %CPU %MEM     TIME+ COMMAND
+    1 root      20   0   36484   3012   2660 R  0.0  0.3   0:00.30 top
+
+top - 06:40:24 up 33 min,  0 users,  load average: 0.00, 0.00, 0.00
+Tasks:   1 total,   1 running,   0 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  0.0 us,  0.0 sy,  0.0 ni,100.0 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+KiB Mem :  1007556 total,   116000 free,   369320 used,   522236 buff/cache
+KiB Swap:        0 total,        0 free,        0 used.   506220 avail Mem
+
+  PID USER      PR  NI    VIRT    RES    SHR S %CPU %MEM     TIME+ COMMAND
+    1 root      20   0   36484   3012   2660 R  0.0  0.3   0:00.30 top
+
+top - 06:40:27 up 33 min,  0 users,  load average: 0.00, 0.00, 0.00
+Tasks:   1 total,   1 running,   0 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  0.0 us,  0.0 sy,  0.0 ni,100.0 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+KiB Mem :  1007556 total,   116000 free,   369320 used,   522236 buff/cache
+KiB Swap:        0 total,        0 free,        0 used.   506220 avail Mem
+
+  PID USER      PR  NI    VIRT    RES    SHR S %CPU %MEM     TIME+ COMMAND
+    1 root      20   0   36484   3012   2660 R  0.0  0.3   0:00.30 top
+
+top - 06:40:30 up 33 min,  0 users,  load average: 0.00, 0.00, 0.00
+Tasks:   1 total,   1 running,   0 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  0.0 us,  0.0 sy,  0.0 ni,100.0 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+KiB Mem :  1007556 total,   116000 free,   369320 used,   522236 buff/cache
+KiB Swap:        0 total,        0 free,        0 used.   506220 avail Mem
+
+  PID USER      PR  NI    VIRT    RES    SHR S %CPU %MEM     TIME+ COMMAND
+    1 root      20   0   36484   3012   2660 R  0.0  0.3   0:00.30 top
+
+top - 06:40:33 up 33 min,  0 users,  load average: 0.00, 0.00, 0.00
+Tasks:   1 total,   1 running,   0 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  0.0 us,  0.3 sy,  0.0 ni, 99.7 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+KiB Mem :  1007556 total,   116000 free,   369316 used,   522240 buff/cache
+KiB Swap:        0 total,        0 free,        0 used.   506220 avail Mem
+
+  PID USER      PR  NI    VIRT    RES    SHR S %CPU %MEM     TIME+ COMMAND
+    1 root      20   0   36484   3012   2660 R  0.0  0.3   0:00.30 top
+
+top - 06:40:36 up 33 min,  0 users,  load average: 0.00, 0.00, 0.00
+Tasks:   1 total,   1 running,   0 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  0.7 us,  0.0 sy,  0.0 ni, 99.3 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+KiB Mem :  1007556 total,   116000 free,   369316 used,   522240 buff/cache
+KiB Swap:        0 total,        0 free,        0 used.   506232 avail Mem
+
+  PID USER      PR  NI    VIRT    RES    SHR S %CPU %MEM     TIME+ COMMAND
+    1 root      20   0   36484   3012   2660 R  0.0  0.3   0:00.30 top
+
+top - 06:40:39 up 33 min,  0 users,  load average: 0.00, 0.00, 0.00
+Tasks:   1 total,   1 running,   0 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  0.3 us,  0.0 sy,  0.0 ni, 99.7 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+KiB Mem :  1007556 total,   116000 free,   369308 used,   522248 buff/cache
+KiB Swap:        0 total,        0 free,        0 used.   506264 avail Mem
+
+  PID USER      PR  NI    VIRT    RES    SHR S %CPU %MEM     TIME+ COMMAND
+    1 root      20   0   36484   3012   2660 R  0.0  0.3   0:00.30 top
+
+top - 06:40:42 up 33 min,  0 users,  load average: 0.00, 0.00, 0.00
+Tasks:   1 total,   1 running,   0 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  0.0 us,  0.0 sy,  0.0 ni,100.0 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+KiB Mem :  1007556 total,   116000 free,   369304 used,   522252 buff/cache
+KiB Swap:        0 total,        0 free,        0 used.   506264 avail Mem
+
+  PID USER      PR  NI    VIRT    RES    SHR S %CPU %MEM     TIME+ COMMAND
+    1 root      20   0   36484   3012   2660 R  0.0  0.3   0:00.30 top
+
+top - 06:40:45 up 34 min,  0 users,  load average: 0.00, 0.00, 0.00
+Tasks:   1 total,   1 running,   0 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  0.0 us,  0.0 sy,  0.0 ni,100.0 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+KiB Mem :  1007556 total,   116000 free,   369304 used,   522252 buff/cache
+KiB Swap:        0 total,        0 free,        0 used.   506264 avail Mem
+
+  PID USER      PR  NI    VIRT    RES    SHR S %CPU %MEM     TIME+ COMMAND
+    1 root      20   0   36484   3012   2660 R  0.0  0.3   0:00.30 top
+
+top - 06:40:48 up 34 min,  0 users,  load average: 0.00, 0.00, 0.00
+Tasks:   1 total,   1 running,   0 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  0.0 us,  0.0 sy,  0.0 ni,100.0 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+KiB Mem :  1007556 total,   116000 free,   369304 used,   522252 buff/cache
+KiB Swap:        0 total,        0 free,        0 used.   506268 avail Mem
+
+  PID USER      PR  NI    VIRT    RES    SHR S %CPU %MEM     TIME+ COMMAND
+    1 root      20   0   36484   3012   2660 R  0.0  0.3   0:00.30 top
+
+top - 06:40:51 up 34 min,  0 users,  load average: 0.00, 0.00, 0.00
+Tasks:   1 total,   1 running,   0 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  0.0 us,  0.0 sy,  0.0 ni,100.0 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+KiB Mem :  1007556 total,   116000 free,   369304 used,   522252 buff/cache
+KiB Swap:        0 total,        0 free,        0 used.   506268 avail Mem
+
+  PID USER      PR  NI    VIRT    RES    SHR S %CPU %MEM     TIME+ COMMAND
+    1 root      20   0   36484   3012   2660 R  0.0  0.3   0:00.30 top
+
+
+27. Create a file with any name in root directory
+       root@3b024c75828a:/# vi file1.txt
+root@3b024c75828a:/# ls -la
+total 96
+    drwxr-xr-x  1 root root 4096 Nov  7 11:26 .
+    drwxr-xr-x  1 root root 4096 Nov  7 11:26 ..
+    -rwxr-xr-x  1 root root    0 Nov  7 11:24 .dockerenv
+    drwxr-xr-x  2 root root 4096 Oct 29 21:25 bin
+    drwxr-xr-x  2 root root 4096 Apr 24  2018 boot
+    drwxr-xr-x  5 root root  360 Nov  7 11:24 dev
+    drwxr-xr-x  1 root root 4096 Nov  7 11:25 etc
+    -rw-r--r--  1 root root   29 Nov  7 11:26 file1.txt
+    drwxr-xr-x  2 root root 4096 Apr 24  2018 home
+    drwxr-xr-x  1 root root 4096 May 23  2017 lib
+    drwxr-xr-x  2 root root 4096 Oct 29 21:25 lib64
+    drwxr-xr-x  2 root root 4096 Oct 29 21:25 media
+    drwxr-xr-x  2 root root 4096 Oct 29 21:25 mnt
+    drwxr-xr-x  2 root root 4096 Oct 29 21:25 opt
+    dr-xr-xr-x 71 root root    0 Nov  7 11:24 proc
+    drwx------  1 root root 4096 Nov  7 11:26 root
+    drwxr-xr-x  5 root root 4096 Oct 31 22:20 run
+    drwxr-xr-x  2 root root 4096 Oct 31 22:20 sbin
+    drwxr-xr-x  2 root root 4096 Oct 29 21:25 srv
+    dr-xr-xr-x 13 root root    0 Nov  7 11:24 sys
+    drwxrwxrwt  1 root root 4096 Nov  7 11:25 tmp
+    drwxr-xr-x  1 root root 4096 Oct 29 21:25 usr
+    drwxr-xr-x  1 root root 4096 Oct 29 21:25 var
+
+28. Install software of your choice in ubuntu container using "apt-get install"
+     using apt-get update
+     and using apt-get -y install vim
+     installed vim editor in the ubuntu container
+
+29. Now exit the ubuntu shell, are you back to your host machine, if not, come back to the host machine.
+
+      root@3b024c75828a:/# exit
+        exit
+      $ docker ps
+         CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+      $ docker ps -a
+        CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS                      PORTS               NAMES
+        3b024c75828a        ubuntu              "/bin/bash"         2 minutes ago       Exited (0) 17 seconds ago 
+
+
+30. Check if the ubuntu container is running.
+       root@3b024c75828a:/# exit
+        exit
+      $ docker ps
+         CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+
+     No ubuntu container is not running
+
+31. Create a new ubuntu container out of the same image as that previous container in attached mode.
+
+      docker run -d --name demo6 ubuntu:latest /usr/bin/top -b
+      docker attach demo6(in attached mode)
+
+32. Login as a root user
+
+   $ docker exec -i -t 8980ae08b5b6 /bin/bash
+
+       root@8980ae08b5b6:/#
+
+33. Check if you can see the file created in previous container, you will not see the file as well as software that you installed in the previous container.
+       
+        $ docker exec -i -t 8980ae08b5b6 /bin/bash
+
+          root@8980ae08b5b6:/# ls -la
+              drwxr-xr-x  1 root root 4096 May 23  2017 lib
+    drwxr-xr-x  2 root root 4096 Oct 29 21:25 lib64
+    drwxr-xr-x  2 root root 4096 Oct 29 21:25 media
+    drwxr-xr-x  2 root root 4096 Oct 29 21:25 mnt
+    drwxr-xr-x  2 root root 4096 Oct 29 21:25 opt
+    dr-xr-xr-x 71 root root    0 Nov  7 11:24 proc
+    drwx------  1 root root 4096 Nov  7 11:26 root
+    drwxr-xr-x  5 root root 4096 Oct 31 22:20 run
+    drwxr-xr-x  2 root root 4096 Oct 31 22:20 sbin
+    drwxr-xr-x  2 root root 4096 Oct 29 21:25 srv
+    dr-xr-xr-x 13 root root    0 Nov  7 11:24 sys
+    drwxrwxrwt  1 root root 4096 Nov  7 11:25 tmp
+    drwxr-xr-x  1 root root 4096 Oct 29 21:25 usr
+
+
+    i am not able to see software and file in the container
+
+
+
+34. Do you have the previous ubuntu container where you created the file and installed the software? If no reapeat step 25 to 29.
+
+
+    No i dont have ubuntu container so i repeated step 25 to 29
+
+
+    $ git pull ubuntu
+fatal: Not a git repository (or any of the parent directories): .git
+$ docker pull ubuntu
+Using default tag: latest
+latest: Pulling from library/ubuntu
+7ddbc47eeb70: Pull complete
+c1bbdc448b72: Pull complete
+8c3b70e39044: Pull complete
+45d437916d57: Pull complete
+Digest: sha256:6e9f67fa63b0323e9a1e587fd71c561ba48a034504fb804fd26fd8800039835d
+Status: Downloaded newer image for ubuntu:latest
+$ docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+$ docker run -it ubuntu
+root@3b024c75828a:/# ls -la
+total 72
+
+root@3b024c75828a:/# apt-get -y install vim
+Reading package lists... Done
+Building dependency tree
+Reading state information... Done
+The following additional packages will be installed:
+  file libexpat1 libgpm2 libmagic-mgc libmagic1 libmpdec2 libpython3.6 libpython3.6-minimal libpython3.6-stdlib libreadline7 libsqlite3-0 libssl1.1 mime-support readline-common vim-common vim-runtime
+  xxd xz-utils
+Suggested packages:
+  gpm readline-doc ctags vim-doc vim-scripts
+The following NEW packages will be installed:
+  file libexpat1 libgpm2 libmagic-mgc libmagic1 libmpdec2 libpython3.6 libpython3.6-minimal libpython3.6-stdlib libreadline7 libsqlite3-0 libssl1.1 mime-support readline-common vim vim-common
+  vim-runtime xxd xz-utils
+0 upgraded, 19 newly installed, 0 to remove and 0 not upgraded.
+Need to get 12.9 MB of archives.
+After this operation, 61.5 MB of additional disk space will be used.
+Get:1 http://archive.ubuntu.com/ubuntu bionic-updates/main amd64 libmagic-mgc amd64 1:5.32-2ubuntu0.3 [184 kB]
+Get:2 http://archive.ubuntu.com/ubuntu bionic-updates/main amd64 libmagic1 amd64 1:5.32-2ubuntu0.3 [68.7 kB]
+
+root@3b024c75828a:/# vi file1.txt
+
+
+35. Create an Image out of the existing container.
+
+
+ $ docker ps -a
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS                        PORTS               NAMES
+3b024c75828a        ubuntu              "/bin/bash"         5 minutes ago       Exited (127) 10 seconds ago                       awesome_shtern
+$ docker commit 3b024c75828a
+sha256:47a716e9b0464c8b4376703b46dc2d090b56f1e57419ab4f87f92dc0bfc2747c
+$ docker image ls
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+<none>              <none>              47a716e9b046        9 seconds ago       152MB
+ubuntu              latest              775349758637        6 days ago          64.2MB
+ubuntu              <none>              16508e5c265d        14 months ago       84.1MB
+redis               latest              4e8db158f18d        15 months ago       83.4MB
+weaveworks/scope    1.9.1               4b07159e407b        15 months ago       68MB
+alpine              latest              11cd0b38bc3c        16 months ago       4.41MB
+$ docker tag 47a716e9b046 myimage
+$ docker image ls
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+myimage             latest              47a716e9b046        45 seconds ago      152MB
+ubuntu              latest              775349758637        6 days ago          64.2MB
+ubuntu              <none>              16508e5c265d        14 months ago       84.1MB
+redis               latest              4e8db158f18d        15 months ago       83.4MB
+weaveworks/scope    1.9.1               4b07159e407b        15 months ago       68MB
+alpine              latest              11cd0b38bc3c        16 months ago       4.41MB
+
+
+36. Now Create a Container out of this image and login into it to see if you can see the file and software installed by you in the previous container.
+
+
+$ docker run -it myimage
+root@9e33ee40150d:/# ls -la
+total 88
+drwxr-xr-x  1 root root 4096 Nov  7 11:32 .
+drwxr-xr-x  1 root root 4096 Nov  7 11:32 ..
+-rwxr-xr-x  1 root root    0 Nov  7 11:32 .dockerenv
+drwxr-xr-x  2 root root 4096 Oct 29 21:25 bin
+drwxr-xr-x  2 root root 4096 Apr 24  2018 boot
+drwxr-xr-x  5 root root  360 Nov  7 11:32 dev
+drwxr-xr-x  1 root root 4096 Nov  7 11:32 etc
+-rw-r--r--  1 root root   29 Nov  7 11:29 file1.txt
+drwxr-xr-x  2 root root 4096 Apr 24  2018 home
+drwxr-xr-x  8 root root 4096 May 23  2017 lib
+drwxr-xr-x  2 root root 4096 Oct 29 21:25 lib64
+drwxr-xr-x  2 root root 4096 Oct 29 21:25 media
+drwxr-xr-x  2 root root 4096 Oct 29 21:25 mnt
+drwxr-xr-x  2 root root 4096 Oct 29 21:25 opt
+dr-xr-xr-x 71 root root    0 Nov  7 11:32 proc
+drwx------  1 root root 4096 Nov  7 11:29 root
+drwxr-xr-x  5 root root 4096 Oct 31 22:20 run
+drwxr-xr-x  2 root root 4096 Oct 31 22:20 sbin
+drwxr-xr-x  2 root root 4096 Oct 29 21:25 srv
+dr-xr-xr-x 13 root root    0 Nov  7 11:24 sys
+drwxrwxrwt  2 root root 4096 Oct 29 21:25 tmp
+drwxr-xr-x 10 root root 4096 Oct 29 21:25 usr
+drwxr-xr-x 11 root root 4096 Oct 29 21:25 var
+
+yes created file and software is there
+
+
+37. Do you have running tomcat container? If yes, Stop it and kill all tomcat container.
+
+yes tomcat container is running there, now we need to stop and kill
+
+$ docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED              STATUS              PORTS                    NAMES
+de9578708d40        tomcat:7            "catalina.sh run"   About a minute ago   Up About a minute   0.0.0.0:8888->8080/tcp   boring_goldwasser
+8980ae08b5b6        ubuntu:latest       "/usr/bin/top -b"   26 minutes ago       Up 18 minutes                                demo6
+$ docker stop de9578708d40
+de9578708d40
+$ docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+8980ae08b5b6        ubuntu:latest       "/usr/bin/top -b"   26 minutes ago      Up 18 minutes                           demo6
+
+
+38. Create an index.html file with following code in it:-
+	<h1>This is Tomcat Container</h1>
+Now, Start a tomcat container in such a way that on hitting its URL for home page it should show the above html page.
+
+
+Facing problem
+
+
+39. type below command:-
+	docker images --help
+Now, try to run command that proves the concept of following three options:-
+1. -a
+
+docker images -a
+it will display all the images
+
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+ubuntu              latest              775349758637        6 days ago          64.2MB
+tomcat              7                   e3a393545a10        2 weeks ago         506MB
+ubuntu              <none>              16508e5c265d        14 months ago       84.1MB
+redis               latest              4e8db158f18d        15 months ago       83.4MB
+weaveworks/scope    1.9.1               4b07159e407b        15 months ago       68MB
+alpine              latest              11cd0b38bc3c        16 months ago       4.41MB
+2. -f
+
+it will filter out the images based on the parameter mentioned
+
+$ docker images -f "dangling=true"
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+ubuntu              <none>              16508e5c265d        14 months ago       84.1MB
+
+3. -q
+ it will display only imageid of the image
+
+ docker images -q
+775349758637
+e3a393545a10
+16508e5c265d
+4e8db158f18d
+4b07159e407b
+11cd0b38bc3c
+
+---------------------------------------------------------------------------------------------------
+40. type below command:-
+	docker ps --help
+Now, try to run command that proves the concept of following six options:-
+1. -a
+
+it will list out all running and non-running container
+$ docker ps -a
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS                       PORTS               NAMES
+de9578708d40        tomcat:7            "catalina.sh run"   7 minutes ago       Exited (143) 6 minutes ago                       boring_goldwasser
+8980ae08b5b6        ubuntu:latest       "/usr/bin/top -b"   33 minutes ago      Up 24 minutes                                    demo6
+2. -f
+3. -q
+
+$ docker ps -q
+8980ae08b5b6
+
+it will give container id of the running container
+4. -n
+
+it will display last n created container
+
+$ docker ps -n 2
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS                        PORTS               NAMES
+de9578708d40        tomcat:7            "catalina.sh run"   15 minutes ago      Exited (143) 14 minutes ago                       boring_goldwasser
+8980ae08b5b6        ubuntu:latest       "/usr/bin/top -b"   41 minutes ago      Up 32 minutes                                     demo6
+
+above example show last 2 created container
+5. -l
+
+it will display last created container
+$ docker ps -l
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS                        PORTS               NAMES
+de9578708d40        tomcat:7            "catalina.sh run"   16 minutes ago      Exited (143) 15 minutes ago                       boring_goldwasser
+6. -s
+it will display total size of container
+$ docker ps -s
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES               SIZE
+8980ae08b5b6        ubuntu:latest       "/usr/bin/top -b"   43 minutes ago      Up 35 minutes                           demo6               5B (virtual 64.2MB)
