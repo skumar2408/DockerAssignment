@@ -1,0 +1,175 @@
+Your supermarket company has a simple web service built on nginx that serves a static list of fresh fruit available in their stores. They want to run this service as a Docker container in their new swarm environment, but first they need you to build a Docker image for this service.
+
+On this repo (https://github.com/satyensingh/full-docker-training-16-Z-Assignment1.git), you will find the files needed to create the image. Create a Dockerfile to define the image according to the provided specifications, then test the image by running a container in detached mode and verifying that you can access the fresh fruit data from the application.
+
+The image should meet the following specifications:
+
+1. Use nginx tag 1.15.8 as the base image.
+2. Add the static fresh fruit data to the image so that it will be served by the nginx server. The data file is located on the server at static/fruit.json under the project directory. Add this file to the image at the location /usr/share/nginx/html/fruit.json.
+3. Add the nginx configuration file. This file is located on the server in the project directory and is called nginx.conf. Add this file to the image at /etc/nginx/nginx.conf.
+4. The image should expose port 80.
+5. Use the following as the default command: nginx -g daemon off;.
+6. Build the image with the tag fruit-list:1.0.0
+
+Once you have built the image you should be able to test it by running it as a container:
+
+docker run --name fruit-list -d -p 8080:80 fruit-list:1.0.0
+
+
+Verify that the container serves the required data by making a request to it on port 8080. If everything is set up correctly, you should get a JSON list of fruits.
+
+curl localhost:8080
+
+
+[NOTE: Write the series of commands to achieve above in this file below the question scenario with documentation]
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+1. create docker file in the root directory
+    $ vi Dockerfile
+      FROM nginx:1.15.8
+      RUN apt-get update
+      WORKDIR /usr/share/nginx/html
+      ADD ./projfruit/static/fruit.json ./
+      WORKDIR /etc/nginx
+      ADD ./projfruit/nginx.conf ./
+      EXPOSE 80
+2 create static directory
+   $ mkdir static
+   $ cd static
+   $ pwd
+      /root/projfruit/static
+   $ vi fruit.json
+        copy the jsonfile (fruit.json) from github repository
+         https://github.com/satyensingh/full-docker-training-16-Z-Assignment1.git
+   $ls
+      fruit.json
+
+3.create nginx.conf in the root directory copy the nginx.conf from github repository
+         https://github.com/satyensingh/full-docker-training-16-Z-Assignment1.git
+
+    $ cd /root/projfruit
+    $ vi nginx.conf
+    $ ls
+         Dockerfile  nginx.conf  static
+4. Run the Dockerfile in the root directory
+    $  docker build -t fruit-list:1.0.0 .
+Sending build context to Docker daemon  20.48kB
+Step 1/7 : FROM nginx:1.15.8
+ ---> f09fe80eb0e7
+Step 2/7 : RUN apt-get update
+ ---> Using cache
+ ---> 078f3d61f29c
+Step 3/7 : WORKDIR /usr/share/nginx/html
+ ---> Using cache
+ ---> 2d4da568c848
+Step 4/7 : ADD ./static/fruit.json ./
+ ---> 140b21c880ed
+Step 5/7 : WORKDIR /etc/nginx
+ ---> Running in df1eb4c2479b
+Removing intermediate container df1eb4c2479b
+ ---> aec9e09a39e0
+Step 6/7 : ADD nginx.conf ./
+ ---> be878043a77f
+Step 7/7 : EXPOSE 80
+ ---> Running in 08102238c2c3
+Removing intermediate container 08102238c2c3
+ ---> 4b3e72ea23c3
+Successfully built 4b3e72ea23c3
+Successfully tagged fruit-list:1.0.0
+
+5.run the container
+     $ docker run --name fruit-list -d -p 8080:80 fruit-list:1.0.0
+        27d44f82dba220dc36926280b8a1652449ca80447eaccae7af84dc12b9594b11
+     $ docker ps
+        CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS     PORTS                  NAMES
+        27d44f82dba2        fruit-list:1.0.0    "nginx -g 'daemon of…"   9 seconds ago       Up 8 seconds     0.0.0.0:8080->80/tcp   fruit-list
+6. curl localhost:8080
+    {
+  "description": "A list of fruits.",
+  "fruits": [
+    "apple",
+    "apricot",
+    "avocado",
+    "banana",
+    "bell pepper",
+    "bilberry",
+    "blackberry",
+    "blackcurrant",
+    "blood orange",    "blueberry",
+    "boysenberry",
+    "breadfruit",
+    "canary melon",
+    "cantaloupe",    "cherimoya",
+    "cherry",    "chili pepper",
+    "clementine",
+    "cloudberry",
+    "coconut",
+    "cranberry",
+    "cucumber",
+    "currant",
+    "damson",
+    "date",
+    "dragonfruit",
+    "durian",
+    "eggplant",
+    "elderberry",
+    "feijoa",
+    "fig",
+    "goji berry",
+    "gooseberry",
+    "grape",
+    "grapefruit",
+    "guava",
+    "honeydew",
+    "huckleberry",
+    "jackfruit",
+    "jambul",
+    "jujube",
+    "kiwi fruit",
+    "kumquat",
+    "lemon",
+    "lime",
+    "loquat",
+    "lychee",
+    "mandarine",
+    "mango",
+    "mulberry",
+    "nectarine",
+    "nut",
+    "olive",
+    "orange",
+    "pamelo",
+    "papaya",
+    "passionfruit",
+    "peach",
+    "pear",
+    "persimmon",
+    "physalis",
+    "pineapple",
+    "plum",
+    "pomegranate",
+    "pomelo",
+    "purple mangosteen",
+    "quince",
+    "raisin",
+    "rambutan",
+    "raspberry",
+    "redcurrant",
+    "rock melon",
+    "salal berry",
+    "satsuma",
+    "star fruit",
+    "strawberry",
+    "tamarillo",
+    "tangerine",
+    "tomato",
+    "ugli fruit",
+    "watermelon"
+  ]
+}

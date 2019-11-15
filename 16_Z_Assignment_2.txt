@@ -1,0 +1,254 @@
+Your company has recently decided to use Docker to run containers in production. They have built some Docker images to run their own proprietary software and need a place to store and manage these images. You have been asked to build a secure, private Docker registry for use by the company. In order to verify that everything works, you have also been asked to configure a Docker workstation server to push to and pull from the registry.
+
+To complete this lab, ensure that the following requirements are met for the registry:
+
+1. A private Docker registry is running on the Docker registry server using version 2 of the registry image.
+2. The container name for the registry should be registry.
+3. The registry should always automatically restart if it stops or the Docker daemon or server restarts.
+4. The registry should require authentication. Set up an initial account with the username docker and the password d0ck3rrU73z.
+5. The registry should use TLS with a self-signed certificate.
+6. The registry should listen on port 443.
+
+
+Set up the Docker workstation server to meet the following requirements:
+
+1. Docker is logged in to the private registry.
+2. Docker is configured to accept the self-signed cert. Do not turn off certificate verification using the insecure-registries setting.
+3. To confirm that everything is working, push a test image called ip-10-0-1-101:443/test-image:1 to the private registry. You can pull any image from Docker hub and tag it with ip-10-0-1-101:443/test-image:1 as a test.
+4. Delete the test image locally and pull it from the registry.
+
+[NOTE: Write the series of commands to achieve above in this file below the question scenario with documentation]
+
+
+---------------------------------------------------------------------------------------------------------------------------------------
+
+Solutions:-
+
+---creating registry directory
+
+[node1] (local) root@192.168.0.53 ~
+$ mkdir registry
+[node1] (local) root@192.168.0.53 ~
+$ cd registry
+
+----creating auth directory
+[node1] (local) root@192.168.0.53 ~/registry
+$ mkdir auth
+[node1] (local) root@192.168.0.53 ~/registry
+$ cd auth
+[node1] (local) root@192.168.0.53 ~/registry/auth
+$ ls
+[node1] (local) root@192.168.0.53 ~/registry/auth
+$ cd..
+bash: cd..: command not found
+[node1] (local) root@192.168.0.53 ~/registry
+$ pwd
+/root/registry
+
+----creating registry with username :-docker and password:-d0ck3rrU73 , password is stored in encrypted form in auth/htpasswd directory
+[node1] (local) root@192.168.0.53 ~/registry
+$ docker run --entrypoint htpasswd registry:2 -Bbn docker d0ck3rrU73z > auth/htpasswd
+Unable to find image 'registry:2' locally
+2: Pulling from library/registry
+c87736221ed0: Pulling fs layer
+1cc8e0bb44df: Pulling fs layer
+54d33bcb37f5: Pulling fs layer
+e8afc091c171: Pulling fs layer
+b4541f6d3db6: Pulling fs layer
+1cc8e0bb44df: Verifying Checksum
+1cc8e0bb44df: Download complete
+c87736221ed0: Verifying Checksum
+c87736221ed0: Download complete
+54d33bcb37f5: Verifying Checksum
+54d33bcb37f5: Download complete
+e8afc091c171: Verifying Checksum
+e8afc091c171: Download complete
+c87736221ed0: Pull complete
+b4541f6d3db6: Verifying Checksum
+b4541f6d3db6: Download complete
+1cc8e0bb44df: Pull complete
+54d33bcb37f5: Pull complete
+e8afc091c171: Pull complete
+b4541f6d3db6: Pull complete
+Digest: sha256:8004747f1e8cd820a148fb7499d71a76d45ff66bac6a29129bfdbfdc0154d146
+Status: Downloaded newer image for registry:2
+[node1] (local) root@192.168.0.53 ~/registry
+$ cd auth
+[node1] (local) root@192.168.0.53 ~/registry/auth
+$ ls
+htpasswd
+[node1] (local) root@192.168.0.53 ~/registry/auth
+
+
+-----checking encrypted password
+$ cat htpasswd
+docker:$2y$05$VHyXHqyrTCVtq.eVk8f6WOTr2apl.AVXRmMB3vpVHIKZPYEnTRINC
+
+------------------creating certs directory
+Copy the .crt and .key files from the CA into the certs directory. The following steps assume that the files are named domain.crt and domain.key.
+
+       [node1] (local) root@192.168.0.53 ~/registry/auth
+       $ mkdir certs
+
+-----writing/generating new private key
+Copy the .crt and .key files from the CA into the certs directory. The following steps assume that the files are named domain.crt and domain.key.
+
+      [node1] (local) root@192.168.0.53 ~/registry/auth
+      $ openssl req -newkey rsa:4096 -nodes -sha256 -keyout certs/domain.key -x509 -days 365 -out certs/domain.crtGenerating a RSA private key
+
+            writing new private key to 'certs/domain.key'
+            -----
+            You are about to be asked to enter information that will be incorporated
+            into your certificate request.
+            What you are about to enter is what is called a Distinguished Name or a DN.
+            There are quite a few fields but you can leave some blank
+             For some fields there will be a default value,
+              If you enter '.', the field will be left blank.
+            -----
+            Country Name (2 letter code) [AU]:
+            State or Province Name (full name) [Some-State]:
+            Locality Name (eg, city) []:
+            Organization Name (eg, company) [Internet Widgits Pty Ltd]:
+            Organizational Unit Name (eg, section) []:
+            Common Name (e.g. server FQDN or YOUR name) []:
+            Email Address []:
+
+
+[node1] (local) root@192.168.0.53 ~/registry/auth
+$ cd certs
+
+-------domain.crt and domain.key are present inside certs directory
+
+         [node1] (local) root@192.168.0.53 ~/registry/auth/certs
+         $ ls
+             domain.crt  domain.key
+         [node1] (local) root@192.168.0.53 ~/registry/auth/certs
+           $ cd ..
+
+-------- Encrypted password is stored under file htpassword
+
+        [node1] (local) root@192.168.0.53 ~/registry/auth
+         $ ls
+      certs     htpasswd
+
+------------Start the registry with basic authentication
+
+
+[node1] (local) root@192.168.0.53 ~/registry/auth
+$ docker run -d -p 443:443 --restart=always --name registry -v /root/registry/auth:/auth -e REGISTRY_HTTP_ADDR=0.0.0.0:443 -e REGISTRY_AUTH=htpasswd -e "REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm" -e REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd -v /root/registry/auth/certs:/certs -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt -e REGISTRY_HTTP_TLS_KEY=/certs/domain.key registry:2
+c79b9dd5dcad336176155422f73fae482e4f0f600a83e2a8c7a91c51c7ad3c17
+[node1] (local) root@192.168.0.53 ~/registry/auth
+$ docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                            NAMES
+c79b9dd5dcad        registry:2          "/entrypoint.sh /etc…"   10 seconds ago      Up 9 seconds        0.0.0.0:443->443/tcp, 5000/tcp   registry
+[node1] (local) root@192.168.0.53 ~/registry/auth
+$ docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                            NAMES
+c79b9dd5dcad        registry:2          "/entrypoint.sh /etc…"   14 seconds ago      Up 12 seconds       0.0.0.0:443->443/tcp, 5000/tcp   registry
+[node1] (local) root@192.168.0.53 ~/registry/auth
+$ docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                            NAMES
+c79b9dd5dcad        registry:2          "/entrypoint.sh /etc…"   21 seconds ago      Up 20 seconds       0.0.0.0:443->443/tcp, 5000/tcp   registry
+[node1] (local) root@192.168.0.53 ~/registry/auth
+$ cd ~
+[node1] (local) root@192.168.0.53 ~
+
+
+--------- After starting the registry . Go to root directory and login with localhost:443 , after give username as docker and password as "d0ck3rrU73z"
+
+$ docker login localhost:443
+Username: docker
+Password: 
+WARNING! Your password will be stored unencrypted in /root/.docker/config.json.
+Configure a credential helper to remove this warning. See
+https://docs.docker.com/engine/reference/commandline/login/#credentials-store
+
+Login Succeeded
+[node1] (local) root@192.168.0.53 ~
+
+------- PUll ubuntu image from dockerhub 
+
+$ docker pull ubuntu
+Using default tag: latest
+latest: Pulling from library/ubuntu
+7ddbc47eeb70: Pull complete 
+c1bbdc448b72: Pull complete 
+8c3b70e39044: Pull complete 
+45d437916d57: Pull complete 
+Digest: sha256:6e9f67fa63b0323e9a1e587fd71c561ba48a034504fb804fd26fd8800039835d
+Status: Downloaded newer image for ubuntu:latest
+docker.io/library/ubuntu:latest
+
+
+
+[node1] (local) root@192.168.0.53 ~
+$ docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+ubuntu              latest              775349758637        13 days ago         64.2MB
+registry            2                   f32a97de94e1        8 months ago        25.8MB
+
+
+-------tag base image of ubuntu with localhost:443/ubuntu
+[node1] (local) root@192.168.0.53 ~
+$ docker tag ubuntu localhost:443/ubuntu:1
+[node1] (local) root@192.168.0.53 ~
+$ docker images
+REPOSITORY             TAG                 IMAGE ID            CREATED             SIZE
+ubuntu                 latest              775349758637        13 days ago         64.2MB
+localhost:443/ubuntu   1              775349758637        13 days ago         64.2MB
+registry               2                   f32a97de94e1        8 months ago        25.8MB
+
+
+-------push newly created image "localhost:443/ubuntu" to the registry
+[node1] (local) root@192.168.0.53 ~
+$ docker push localhost:443/ubuntu:1
+The push refers to repository [localhost:443/ubuntu:1]
+e0b3afb09dc3: Pushed 
+6c01b5a53aac: Pushed 
+2c6ac8e5063e: Pushed 
+cc967c529ced: Pushed 
+latest: digest: sha256:134c7fe821b9d359490cd009ce7ca322453f4f2d018623f849e580a89a685e5d size: 1152
+
+--------------------for testing purpose remove the image of ubuntu and localhost:443/ubuntu from local repo
+                    and try to fetch from localhost:443/ubuntu image from registry
+
+
+[node1] (local) root@192.168.0.53 ~
+$ docker image rm localhost:443/ubuntu:1 ubuntu
+Untagged: ubuntu:latest
+Untagged: ubuntu@sha256:6e9f67fa63b0323e9a1e587fd71c561ba48a034504fb804fd26fd8800039835d
+Error: No such image: localhost:443/ubuntu:1
+[node1] (local) root@192.168.0.53 ~
+$ docker image rm localhost:443/ubuntu:latest ubuntu
+Untagged: localhost:443/ubuntu:latest
+Untagged: localhost:443/ubuntu@sha256:134c7fe821b9d359490cd009ce7ca322453f4f2d018623f849e580a89a685e5d
+Deleted: sha256:775349758637aff77bf85e2ff0597e86e3e859183ef0baba8b3e8fc8d3cba51c
+Deleted: sha256:4fc26b0b0c6903db3b4fe96856034a1bd9411ed963a96c1bc8f03f18ee92ac2a
+Deleted: sha256:b53837dafdd21f67e607ae642ce49d326b0c30b39734b6710c682a50a9f932bf
+Deleted: sha256:565879c6effe6a013e0b2e492f182b40049f1c083fc582ef61e49a98dca23f7e
+Deleted: sha256:cc967c529ced563b7746b663d98248bc571afdb3c012019d7f54d6c092793b8b
+Error: No such image: ubuntu
+[node1] (local) root@192.168.0.53 ~
+$ docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+registry            2                   f32a97de94e1        8 months ago        25.8MB
+
+-----------fetching localhost:443/ubuntu image from registry
+
+
+[node1] (local) root@192.168.0.53 ~
+$ docker pull localhost:443/ubuntu:1
+c1bbdc448b72: Pull complete 
+8c3b70e39044: Pull complete 
+45d437916d57: Pull complete 
+Digest: sha256:134c7fe821b9d359490cd009ce7ca322453f4f2d018623f849e580a89a685e5d
+Status: Downloaded newer image for localhost:443/ubuntu:1
+localhost:443/ubuntu:1
+
+-----the image "localhost:443/ubuntu" from registry is shown below:-
+
+[node1] (local) root@192.168.0.53 ~
+$ docker images
+REPOSITORY             TAG                 IMAGE ID            CREATED             SIZE
+localhost:443/ubuntu   1                   775349758637        13 days ago         64.2MB
+registry               2                   f32a97de94e1        8 months ago        25.8MB

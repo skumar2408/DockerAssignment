@@ -1,0 +1,183 @@
+
+Your company is ready to move forward with using Docker to run their applications. However, they have some complex container apps that can take advantage of the cluster management and orchestration features of Docker swarm. You have been asked to stand up a simple Docker swarm cluster to be used for some initial testing. A set of servers has already been provisioned for this purpose. The swarm cluster should meet the following criteria:
+
+One Swarm manager.
+Two worker nodes.
+All nodes should use Docker CE version 5:18.09.5~3-0~ubuntu-bionic.
+Both worker nodes should be joined to the cluster.
+Any non-root user should be able to run docker commands on all three servers.
+
+[NOTE: Write the series of commands to achieve above in this file below the question scenario with documentation]
+
+
+
+
+---------------------------------------------------------------------------------------------------------------------------
+step 1. creating Master Node
+
+[node1] (local) root@192.168.0.33 ~
+$ docker swarm init --advertise-addr 192.168.0.33
+Swarm initialized: current node (8mv6fktf0u2e8zao2ahu1j6ad) is now a manager.
+
+To add a worker to this swarm, run the following command:
+
+    docker swarm join --token SWMTKN-1-4y6gow349a601rxvwilq94e66t9xn4nudpox792b1atjiagxk0-22v7k9coaalp04ji1x33zhsyk 192.168.0.33:2377
+
+To add a manager to this swarm, run 'docker swarm join-token manager' and follow the instructions.
+
+
+it generates token with the help of which worker nodes will connect to master node
+
+
+
+step 2. creating Worker node 1
+
+        paste the above generated join command in workernode 1 terminal
+           
+[node2] (local) root@192.168.0.32 ~
+$ docker swarm join --token SWMTKN-1-4y6gow349a601rxvwilq94e66t9xn4nudpox792b1atjiagxk0-22v7k9coaalp04ji1x33zhsyk 192.168.0.33:2377
+This node joined a swarm as a worker.
+
+step 3. creating Worker node 2
+
+        paste the above generated join command in workernode 2 terminal
+           
+[node2] (local) root@192.168.0.31 ~
+$ docker swarm join --token SWMTKN-1-4y6gow349a601rxvwilq94e66t9xn4nudpox792b1atjiagxk0-22v7k9coaalp04ji1x33zhsyk 192.168.0.33:2377
+This node joined a swarm as a worker.
+
+
+Step 4: To check status of all the node (masternode as well as worker node)
+         first go to Masternode terminal and type following command
+
+          [node1] (local) root@192.168.0.33 ~
+              $ docker node ls
+                          ID                            HOSTNAME            STATUS              AVAILABILITY        MANAGER STATUS      ENGINE VERSION
+                          8mv6fktf0u2e8zao2ahu1j6ad *   node1               Ready               Active              Leader              19.03.4
+                          rnlvy2heljdlujekocetuqx5v     node2               Ready               Active                                  19.03.4
+                          x1a2gt5kufm3x0ll46rekqlbk     node3               Ready               Active                                  19.03.4
+
+
+Step 5 started fruit-list service in manager node
+
+              [node1] (local) root@192.168.0.33 ~
+$ docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+fruit-list          1.0.0               677a6a462986        31 minutes ago      126MB
+nginx               1.15.8              f09fe80eb0e7        9 months ago        109MB
+[node1] (local) root@192.168.0.33 ~
+2R0;276;0c2R0;276;0c
+invalid argument "8081:80802R0" for "-p, --publish" flag: Invalid containerPort: 80802R0
+See 'docker service create --help'.
+bash: 276: command not found
+bash: 0c2R0: command not found
+bash: 276: command not found
+bash: 0c[2: command not found
+bash: 2R0: command not found
+bash: 276: command not found
+bash: 0c2R0: command not found
+bash: 276: command not found
+bash: 0c2R0: command not found
+bash: 276: command not found
+bash: 0c2R0: command not found
+bash: 276: command not found
+bash: 0c: command not found
+bash: 276: command not found
+bash: 0c2R0: command not found
+bash: 276: command not found
+bash: 0c: command not found
+[node1] (local) root@192.168.0.33 ~
+$ docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+fruit-list          1.0.0               677a6a462986        32 minutes ago      126MB
+nginx               1.15.8              f09fe80eb0e7        9 months ago        109MB
+[node1] (local) root@192.168.0.33 ~
+$ docker service create --name "fruitapp" -p 8082:8082 fruit-list:1.0.0
+Error response from daemon: rpc error: code = AlreadyExists desc = name conflicts with an existing object: service fruitapp already exists
+[node1] (local) root@192.168.0.33 ~
+$ docker ps -a
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+[node1] (local) root@192.168.0.33 ~
+$ docker service create --name "fruitapp1" -p 8082:8082 fruit-list:1.0.0
+image fruit-list:1.0.0 could not be accessed on a registry to record
+its digest. Each node will access fruit-list:1.0.0 independently,
+possibly leading to different nodes running different
+versions of the image.
+
+ycszps9ymqjfw0d06qkp7ffku
+overall progress: 1 out of 1 tasks 
+1/1: running   
+verify: Service converged 
+[node1] (local) root@192.168.0.33 ~
+$ docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS               NAMES
+e3096920f05e        fruit-list:1.0.0    "nginx -g 'daemon of…"   16 seconds ago      Up 14 seconds       80/tcp              fruitapp1.1.pbg1ussjlaqifc7dtx774p74r
+[node1] (local) root@192.168.0.33 ~
+$ curl localhost:8082
+curl: (7) Failed to connect to localhost port 8082: Connection refused
+[node1] (local) root@192.168.0.33 ~
+$ curl localhost:8080
+curl: (7) Failed to connect to localhost port 8080: Connection refused
+[node1] (local) root@192.168.0.33 ~
+
+-----List of service
+$ docker service ls
+ID                  NAME                MODE                REPLICAS            IMAGE               PORTS
+zlqira5oa6p5        fruitApp            replicated          0/1                 fruit-list:latest   *:8080->8080/tcp
+ycszps9ymqjf        fruitapp1           replicated          1/1                 fruit-list:1.0.0    *:8082->8082/tcp
+
+
+-----to check which of the servicw is running
+
+
+$ docker service ps fruitapp1
+ID                  NAME                IMAGE               NODE                DESIRED STATE       CURRENT STATE           ERROR               PORTS
+pbg1ussjlaqi        fruitapp1.1         fruit-list:1.0.0    node1               Running             Running 7 minutes ago                       
+[node1] (local) root@192.168.0.33 ~
+
+
+
+---creating replica on all three node
+$ docker service create --name "fruitapp" --replicas 3 fruit-list:1.0.0
+image fruit-list:1.0.0 could not be accessed on a registry to record
+its digest. Each node will access fruit-list:1.0.0 independently,
+possibly leading to different nodes running different
+versions of the image.
+
+ki8rxnpewo4ntw0ew9cono3rk
+overall progress: 3 out of 3 tasks 
+1/3: running   
+2/3: running   
+3/3: running   
+verify: Service converged 
+
+-----checking how many service running
+
+
+
+verify: Service converged 
+[node1] (local) root@192.168.0.33 ~
+$ docker service ps fruitapp
+ID                  NAME                IMAGE               NODE                DESIRED STATE       CURRENT STATE                 ERROR                              PORTS
+lfcewblk1t5i        fruitapp.1          fruit-list:1.0.0    node1               Running             Running about a minute ago                                       
+rswkqyl7ipqe         \_ fruitapp.1      fruit-list:1.0.0    node3               Shutdown            Rejected about a minute ago   "No such image: fruit-list:1.0…"   
+tl4x507lav1h         \_ fruitapp.1      fruit-list:1.0.0    node3               Shutdown            Rejected 2 minutes ago        "No such image: fruit-list:1.0…"   
+1d4q2jjqkgys         \_ fruitapp.1      fruit-list:1.0.0    node3               Shutdown            Rejected 2 minutes ago        "No such image: fruit-list:1.0…"   
+q5576anywsv7         \_ fruitapp.1      fruit-list:1.0.0    node3               Shutdown            Rejected 2 minutes ago        "No such image: fruit-list:1.0…"   
+jhl5mtivsbzo        fruitapp.2          fruit-list:1.0.0    node1               Running             Running about a minute ago                                       
+vb3xqe1bputy         \_ fruitapp.2      fruit-list:1.0.0    node2               Shutdown            Rejected about a minute ago   "No such image: fruit-list:1.0…"   
+352yog1l2rjr         \_ fruitapp.2      fruit-list:1.0.0    node2               Shutdown            Rejected 2 minutes ago        "No such image: fruit-list:1.0…"   
+n3lqnyo0eq5t         \_ fruitapp.2      fruit-list:1.0.0    node2               Shutdown            Rejected 2 minutes ago        "No such image: fruit-list:1.0…"   
+qe3zlogk1lrk         \_ fruitapp.2      fruit-list:1.0.0    node2               Shutdown            Rejected 2 minutes ago        "No such image: fruit-list:1.0…"   
+cln4590nhr4s        fruitapp.3          fruit-list:1.0.0    node1               Running             Running 2 minutes ago                                            
+
+
+only three services are running(2 worker node and 1 master node) ... rest services are shutdown
+
+-----to check how many replicas are running
+
+$ docker service ls
+ID                  NAME                MODE                REPLICAS            IMAGE               PORTS
+ki8rxnpewo4n        fruitapp            replicated          3/3                 fruit-list:1.0.0 
+
+
