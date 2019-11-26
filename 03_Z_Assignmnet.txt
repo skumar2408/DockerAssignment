@@ -1,0 +1,127 @@
+Learning Objectives:-
+Create a yaml file containing the pod spec for the nginx pod.
+Create the pod.
+
+
+Your company is getting ready to launch a new website, and they need you to set up an nginx web server in their Kubernetes cluster. 
+The nginx server will need to be accessible via network in the future, so you will need to expose port 80 as a containerPort for the nginx container. 
+Your team has also asked you to ensure that nginx runs in quiet mode for the time being to cut down on unnecessary log output. 
+You can do this by setting the command to nginx and passing the following arg to the container: -g daemon off; -q. 
+As this nginx server belongs to the Web team, you will need to create it in the team's web namespace.
+
+To summarize:
+
+Use the nginx container image.
+The container needs a containerPort of 80.
+Set the command to nginx
+Pass in the -g daemon off; -q args to run nginx in quiet mode.
+Create the pod in the web namespace.
+Once the pod is created, you should be able to find it with kubectl get pods -n web. Once the pod is created, you can get more information about its current status with kubectl describe pod nginx -n web.
+
+
+
+------------------------------------------------------------------------------------------------------------------------
+
+creating yml file(vi my web-pod.yml)
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-web
+  namespace: web
+  labels:
+    app: myweb
+spec:
+  containers:
+  - name: myweb-container
+    image: nginx
+    ports:
+       - containerPort: 80
+    command: ['sh','-c','nginx', '-g daemon off','-q']
+
+
+
+root@ip-172-31-6-120:/# kubectl get nodes
+NAME              STATUS   ROLES    AGE   VERSION
+ip-172-31-5-6     Ready    <none>   17h   v1.16.3
+ip-172-31-6-120   Ready    master   17h   v1.16.3
+root@ip-172-31-6-120:/# vi web-pod.yml
+root@ip-172-31-6-120:/# kubectl get nodes
+NAME              STATUS   ROLES    AGE   VERSION
+ip-172-31-5-6     Ready    <none>   17h   v1.16.3
+ip-172-31-6-120   Ready    master   17h   v1.16.3
+
+-----------------------------------------------------------
+creating namespace web
+root@ip-172-31-6-120:/# kubectl create namespace web
+namespace/web created
+
+----------------------------------------------------------------------
+
+root@ip-172-31-6-120:/# kubectl get pods my-web --namespace=web
+NAME     READY   STATUS             RESTARTS   AGE
+my-web   0/1     CrashLoopBackOff   9          22m
+
+
+root@ip-172-31-6-120:/# kubectl describe pod my-web --namespace=web
+Name:         my-web
+Namespace:    web
+Priority:     0
+Node:         ip-172-31-5-6/172.31.5.6
+Start Time:   Tue, 26 Nov 2019 03:00:09 +0000
+Labels:       app=myweb
+Annotations:  cni.projectcalico.org/podIP: 192.168.123.4/32
+              kubectl.kubernetes.io/last-applied-configuration:
+                {"apiVersion":"v1","kind":"Pod","metadata":{"annotations":{},"labels":{"app":"myweb"},"name":"my-web","namespace":"web"},"spec":{"containe...
+Status:       Running
+IP:           192.168.123.4
+IPs:
+  IP:  192.168.123.4
+Containers:
+  myweb-container:
+    Container ID:  docker://f474b705e28a628415699ba3921ea6d2dbdd37c4376084bbd16d0257e25b2cfb
+    Image:         nginx
+    Image ID:      docker-pullable://nginx@sha256:50cf965a6e08ec5784009d0fccb380fc479826b6e0e65684d9879170a9df8566
+    Port:          80/TCP
+    Host Port:     0/TCP
+    Command:
+      sh
+      -c
+      nginx
+      -g daemon off
+      -q
+    State:          Waiting
+      Reason:       CrashLoopBackOff
+    Last State:     Terminated
+      Reason:       Completed
+      Exit Code:    0
+      Started:      Tue, 26 Nov 2019 03:21:48 +0000
+      Finished:     Tue, 26 Nov 2019 03:21:48 +0000
+    Ready:          False
+    Restart Count:  9
+    Environment:    <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from default-token-kg4vx (ro)
+Conditions:
+  Type              Status
+  Initialized       True
+  Ready             False
+  ContainersReady   False
+  PodScheduled      True
+Volumes:
+  default-token-kg4vx:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  default-token-kg4vx
+    Optional:    false
+QoS Class:       BestEffort
+Node-Selectors:  <none>
+Tolerations:     node.kubernetes.io/not-ready:NoExecute for 300s
+                 node.kubernetes.io/unreachable:NoExecute for 300s
+Events:
+  Type     Reason     Age                  From                    Message
+  ----     ------     ----                 ----                    -------
+  Normal   Scheduled  24m                  default-scheduler       Successfully assigned web/my-web to ip-172-31-5-6
+  Normal   Pulling    23m (x4 over 24m)    kubelet, ip-172-31-5-6  Pulling image "nginx"
+  Normal   Pulled     23m (x4 over 24m)    kubelet, ip-172-31-5-6  Successfully pulled image "nginx"
+  Normal   Created    23m (x4 over 24m)    kubelet, ip-172-31-5-6  Created container myweb-container
+  Normal   Started    23m (x4 over 24m)    kubelet, ip-172-31-5-6  Started container myweb-container
+  Warning  BackOff    4m5s (x92 over 23m)  kubelet, ip-172-31-5-6  Back-off restarting failed container
